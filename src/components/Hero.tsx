@@ -43,9 +43,11 @@ const Hero = () => {
           <div className="relative">
             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-white/20 to-transparent blur-xl"></div>
             <div className="relative h-72 w-72 rounded-full overflow-hidden border-4 border-white/10">
-              <div className="w-full h-full bg-gradient-to-tr from-secondary to-background flex items-center justify-center text-5xl font-bold">
-                KK
-              </div>
+              <img 
+                src="https://i.postimg.cc/WzBgYx58/Whats-App-Image-2025-05-02-at-09-32-53-330d2ce4.jpg" 
+                alt="Kishore Kumar profile" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>
