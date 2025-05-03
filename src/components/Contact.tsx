@@ -1,21 +1,73 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Phone, Mail, Linkedin } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const { toast } = useToast();
   
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  useEffect(() => {
+    emailjs.init("NhPuVZVVKs9OWnCWw");
+  }, []);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast({
-      title: "Message sent!",
-      description: "Thanks for reaching out. I'll get back to you soon.",
-    });
+    setIsSubmitting(true);
+    
+    try {
+      await emailjs.send(
+        "service_m7vjw7j",
+        "template_wvp3kig",
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
+        "NhPuVZVVKs9OWnCWw"
+      );
+      
+      toast({
+        title: "Message sent!",
+        description: "Thanks for reaching out. I'll get back to you soon.",
+      });
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+    } catch (error) {
+      toast({
+        title: "Error sending message",
+        description: "There was a problem sending your message. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error sending email:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -83,6 +135,9 @@ const Contact = () => {
                     placeholder="Your Name" 
                     required
                     className="bg-white/5 border-white/10 focus:border-white/30"
+                    value={formData.name}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="space-y-2">
@@ -93,6 +148,9 @@ const Contact = () => {
                     placeholder="Your Email" 
                     required
                     className="bg-white/5 border-white/10 focus:border-white/30"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -105,6 +163,9 @@ const Contact = () => {
                   placeholder="Subject" 
                   required
                   className="bg-white/5 border-white/10 focus:border-white/30"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
                 />
               </div>
               
@@ -116,14 +177,18 @@ const Contact = () => {
                   rows={5}
                   required
                   className="bg-white/5 border-white/10 focus:border-white/30"
+                  value={formData.message}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
                 />
               </div>
               
               <Button 
                 type="submit" 
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                disabled={isSubmitting}
               >
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </Card>
